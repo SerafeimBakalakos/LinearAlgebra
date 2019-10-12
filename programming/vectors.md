@@ -7,7 +7,7 @@ Vector x = Vector.CreateZero(10); // creates a vector with 10 zero entries
 Vector y = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 }); // creates a vector with the specified array
  ```
 
-Create sparse vectors to represent $$\begin{bmatrix}1 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}$$
+Create sparse vectors to represent $$\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}$$
 ```csharp
 Dictionary entries = new Dictionary();
 entries[0] = 3.0;
