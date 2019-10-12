@@ -1,3 +1,5 @@
+{% include mathjax.html %}
+
 # Create vectors
 Create dense vectors
 ```csharp
@@ -5,7 +7,7 @@ Vector x = Vector.CreateZero(10); // creates a vector with 10 zero entries
 Vector y = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 }); // creates a vector with the specified array
  ```
 
-Create sparse vectors to represent <a href="https://www.codecogs.com/eqnedit.php?latex=\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" title="\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}" /></a>
+Create sparse vectors to represent $$\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}$$
 ```csharp
 Dictionary entries = new Dictionary();
 entries[0] = 3.0;
