@@ -9,7 +9,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
     /// Compares scalars, vectors and matrices.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    internal class MatrixComparer
+    public class MatrixComparer
     {
         private readonly ValueComparer valueComparer;
 
