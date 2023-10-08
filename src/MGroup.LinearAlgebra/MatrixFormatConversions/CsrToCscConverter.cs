@@ -8,21 +8,32 @@ namespace MGroup.LinearAlgebra.MatrixFormatConversions
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Matrices;
 
-	public class CsrToCscConverter
+	public class CsrToCscConverter : IMatrixFormatConverter<CsrMatrix, CscMatrix>
 	{
 		/// <summary>
-		/// Maps between the values arrays, such that:  cscValues[<see cref="_mapCsrToCsc"/>[k]] = csrValues[k]
+		/// Maps between the values arrays, such that: cscValues[<see cref="_mapCsrToCsc"/>[k]] = csrValues[k]
 		/// </summary>
 		private int[] _mapCsrToCsc;
 
+		public CscMatrix ConvertAndStorePatternConversion(CsrMatrix original)
+		{
+			// This method allocates and stores an extra int[nnz], where nnz is the number of non-zero entries of the
+			// original matrix.
 
-		/// <summary>
-		/// Converts the matrix <paramref name="original"/>, without reading or overwritting the stored sparsity pattern 
-		/// conversion. Use this when you only need to convert between the two matrix storage formats once. Otherwise, it is 
-		/// faster to use <see cref="ConvertAndSavePatternConversion(CsrMatrix)"/> once and 
-		/// <see cref="ConvertUsingStoredPatternConversion(CsrMatrix, CscMatrix)"/> multiple times.
-		/// </summary>
-		/// <param name="original"></param>
+			int m = original.NumRows;
+			int n = original.NumColumns;
+			int nnz = original.RawValues.Length;
+			var cscValues = new double[nnz];
+			var cscRowIndices = new int[nnz];
+			var cscColOffsets = new int[n + 1];
+
+			_mapCsrToCsc = new int[nnz];
+
+			CsrToCscAndPattern(m, n, original.RawRowOffsets, original.RawColIndices, original.RawValues,
+				cscColOffsets, cscRowIndices, cscValues, _mapCsrToCsc);
+			return CscMatrix.CreateFromArrays(m, n, cscValues, cscRowIndices, cscColOffsets, false);
+		}
+
 		public CscMatrix ConvertOnce(CsrMatrix original)
 		{
 			int m = original.NumRows;
@@ -38,55 +49,23 @@ namespace MGroup.LinearAlgebra.MatrixFormatConversions
 			return CscMatrix.CreateFromArrays(m, n, cscValues, cscRowIndices, cscColOffsets, false);
 		}
 
-		/// <summary>
-		/// Converts the matrix <paramref name="original"/> and also stores the conversion between the two formats for this exact
-		/// sparsity pattern. Therefore subsequent conversions can be done much faster by calling 
-		/// <see cref="ConvertUsingStoredPatternConversion(CsrMatrix, CscMatrix)"/>, provided those input and output matrices 
-		/// have the exact same sparsity pattern as the one stored by the last call to 
-		/// <see cref="ConvertAndSavePatternConversion(CsrMatrix)"/>. This method allocates and stores an extra int[nnz], where 
-		/// nnz is the number of non-zero entries in <paramref name="original"/>. If the conversion needs to be done only once,
-		/// use <see cref="ConvertOnce(CsrMatrix)"/> instead, since that method does not allocate any extra memory and does less 
-		/// work.
-		/// </summary>
-		/// <param name="original"></param>
-		public CscMatrix ConvertAndSavePatternConversion(CsrMatrix original)
-		{
-			int m = original.NumRows;
-			int n = original.NumColumns;
-			int nnz = original.RawValues.Length;
-			var cscValues = new double[nnz];
-			var cscRowIndices = new int[nnz];
-			var cscColOffsets = new int[n + 1];
-
-			_mapCsrToCsc = new int[nnz];
-			CsrToCscAndPattern(m, n, original.RawRowOffsets, original.RawColIndices, original.RawValues,
-				cscColOffsets, cscRowIndices, cscValues, _mapCsrToCsc);
-			return CscMatrix.CreateFromArrays(m, n, cscValues, cscRowIndices, cscColOffsets, false);
-		}
-
-		/// <summary>
-		/// Converts the matrix <paramref name="original"/> and the writes into <paramref name="result"/>, overwriting
-		/// its non-zero values array. Both <paramref name="original"/> and <paramref name="result"/> must match the same 
-		/// sparsity pattern, created and saved by the last call to <see cref="ConvertAndSavePatternConversion(CsrMatrix)"/>. 
-		/// Use this method together with <see cref="ConvertUsingStoredPatternConversion(CsrMatrix, CscMatrix)"/>, when the input
-		/// and output matrix have the same pattern over multiple conversions between the 2 storage formats. Otherwise 
-		/// <see cref="ConvertOnce(CsrMatrix)"/> is faster.
-		/// </summary>
-		/// <param name="original">
-		/// The original matrix to convert. Must have the same sparsity pattern as the input matrix of the last call to
-		/// <see cref="ConvertAndSavePatternConversion(CsrMatrix)"/>.
-		/// </param>
-		/// <param name="result">
-		/// It's non-zero values will be overwritten with the corresponding entries of <paramref name="original"/>, but not its 
-		/// pattern arrays. It must have the same sparsity pattern as the returned matrix of the last call to 
-		/// <see cref="ConvertAndSavePatternConversion(CsrMatrix)"/>. It does not need to be cleared first.
-		/// </param>
 		public void ConvertUsingStoredPatternConversion(CsrMatrix original, CscMatrix result) 
 		{
+			if (_mapCsrToCsc == null || result == null)
+			{
+				throw new InvalidOperationException("Must call the method ConvertAndSavePatternConversion(...), " +
+					"before calling ConvertUsingStoredPatternConversion(...)");
+			}
+
 			double[] csrValues = original.RawValues;
 			double[] cscValues = result.RawValues;
-			Debug.Assert(cscValues.Length == csrValues.Length);
-			Debug.Assert(_mapCsrToCsc.Length == csrValues.Length);
+			
+			if (_mapCsrToCsc.Length != csrValues.Length || _mapCsrToCsc.Length != cscValues.Length) 
+			{
+				// Does not ensure that the patterns are identical, but at least it is better than throwing crytpic OutOfRangeException.
+				throw new InvalidOperationException("The method ConvertAndSavePatternConversion(...) was called previously" +
+					"for a matrix with different sparsity pattern than this one.");
+			}
 
 			for (int k = 0; k < csrValues.Length; k++) 
 			{
@@ -98,8 +77,8 @@ namespace MGroup.LinearAlgebra.MatrixFormatConversions
 		/// <summary>
 		/// Compute B = A for CSR matrix A, CSC matrix B.
 		/// Also, with the appropriate arguments can also be used to:
-		///   - compute B = A ^ t for CSR matrix A, CSR matrix B
-		///   - compute B = A ^ t for CSC matrix A, CSC matrix B
+		///   - compute B = A^T for CSR matrix A, CSR matrix B
+		///   - compute B = A^T for CSC matrix A, CSC matrix B
 		///   - convert CSC->CSR
 		/// Complexity: Linear. Specifically O(nnz(A) + max(numRows,numCols))
 		/// </summary>
@@ -137,6 +116,9 @@ namespace MGroup.LinearAlgebra.MatrixFormatConversions
 			RestoreCscColumnOffsets(numCols, Bp);
 		}
 
+		/// <summary>
+		/// Also, with the appropriate arguments can also be used to convert CSC->CSR
+		/// </summary>
 		/// <param name="numRows">Number of rows in A.</param>
 		/// <param name="numCols">Number of columns in A.</param>
 		/// <param name="Ap">Row pointers. Size = numRows+1.</param>

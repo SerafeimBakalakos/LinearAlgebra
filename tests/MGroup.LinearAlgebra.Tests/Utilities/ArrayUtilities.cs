@@ -40,5 +40,31 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 			return true;
 		}
+
+		public static double[] DoToAll(double[] array, Func<double, double> func)
+		{
+			int n = array.Length;
+			var result = new double[n];
+			for (int i = 0; i < n; ++i) 
+			{
+				result[i] = func(array[i]);
+			}
+			return result;
+		}
+
+		public static double[,] DoToAll(double[,] array, Func<double, double> func)
+		{
+			int m = array.GetLength(0);
+			int n = array.GetLength(1);
+			var result = new double[m, n];
+			for (int i = 0; i < m; ++i)
+			{
+				for (int j = 0; j < n; ++j)
+				{
+					result[i, j] = func(array[i, j]);
+				}
+			}
+			return result;
+		}
 	}
 }

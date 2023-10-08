@@ -116,8 +116,8 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     subsequent operations.</param>
         /// <param name="rowIndices">Array that contains the row indices of the non-zero entries. It must have the same 
         ///     length as <paramref name="values"/>. There is an 1 to 1 matching between these two arrays: 
-        ///     <paramref name="rowIndices"/>[i] is the row index of the entry <paramref name="values"/>[i]. Also:
-        ///     0 &lt;= <paramref name="rowIndices"/>[i] &lt; <paramref name="numRows"/>.</param>
+        ///     <paramref name="rowIndices"/>[j] is the row index of the entry <paramref name="values"/>[j]. Also:
+        ///     0 &lt;= <paramref name="rowIndices"/>[j] &lt; <paramref name="numRows"/>.</param>
         /// <param name="colOffsets">Array that contains the index of the first entry of each column into the arrays 
         ///     <paramref name="values"/> and <paramref name="rowIndices"/>. Its length is <paramref name="numRows"/> + 1. The 
         ///     last entry is the number of non-zero entries, which must be equal to the length of <paramref name="values"/> 
@@ -153,17 +153,62 @@ namespace MGroup.LinearAlgebra.Matrices
             return new CscMatrix(numRows, numCols, values, rowIndices, colOffsets);
         }
 
-        #region operators (use extension operators when they become available)
-        /// <summary>
-        /// Performs the matrix-vector multiplication: result = <paramref name="vectorLeft"/> * <paramref name="matrixRight"/>.
-        /// If <paramref name="matrixRight"/> is m1-by-n1 and <paramref name="vectorLeft"/> has length = n2, then m1 must be 
-        /// equal to n2. The result will be a vector with length = n1, written to a new <see cref="Vector"/> instance.
-        /// </summary>
-        /// <param name="vectorLeft">The <see cref="Vector"/> operand on the left. It can be considered as a row vector.</param>
-        /// <param name="matrixRight">The <see cref="CscMatrix"/> operand on the right.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrixRight"/>.<see cref="NumRows"/> is 
-        ///     different than <paramref name="vectorLeft"/>.<see cref="Vector.Length"/>.</exception>
-        public static Vector operator *(Vector vectorLeft, CscMatrix matrixRight)
+		/// <summary>
+		/// Creates a CSC matrix with the non-zero entries of <paramref name="denseMatrix"/>. An entry must be exactly == 0, to be considered zero.
+		/// </summary>
+		/// <param name="denseMatrix"></param>
+		public static CscMatrix CreateFromDense(IIndexable2D denseMatrix) //TODO: replace this with converter class, faster algorithm and option to use tolerance when identifying zero entries
+		{
+			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
+			int m = denseMatrix.NumRows;
+			int n = denseMatrix.NumColumns;
+			int nnz = 0;
+			for (int j = 0; j < n; j++)
+			{
+				for (int i = 0; i < m; ++i)
+				{
+					if (denseMatrix[i, j] != 0)
+					{
+						++nnz;
+					}
+				}
+			}
+
+			var values = new double[nnz];
+			var rowIndices = new int[nnz];
+			var colOffsets = new int[n + 1];
+			colOffsets[n] = nnz;
+
+			int k = 0;
+			for (int j = 0; j < n; ++j)
+			{
+				colOffsets[j] = k;
+				for (int i = 0; i < m; ++i)
+				{
+					double val = denseMatrix[i, j];
+					if (val != 0)
+					{
+						values[k] = val;
+						rowIndices[k] = i;
+						++k;
+					}
+				}
+			}
+
+			return CscMatrix.CreateFromArrays(m, n, values, rowIndices, colOffsets, false);
+		}
+
+		#region operators (use extension operators when they become available)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: result = <paramref name="vectorLeft"/> * <paramref name="matrixRight"/>.
+		/// If <paramref name="matrixRight"/> is m1-by-n1 and <paramref name="vectorLeft"/> has length = n2, then m1 must be 
+		/// equal to n2. The result will be a vector with length = n1, written to a new <see cref="Vector"/> instance.
+		/// </summary>
+		/// <param name="vectorLeft">The <see cref="Vector"/> operand on the left. It can be considered as a row vector.</param>
+		/// <param name="matrixRight">The <see cref="CscMatrix"/> operand on the right.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrixRight"/>.<see cref="NumRows"/> is 
+		///     different than <paramref name="vectorLeft"/>.<see cref="Vector.Length"/>.</exception>
+		public static Vector operator *(Vector vectorLeft, CscMatrix matrixRight)
             => matrixRight.Multiply(vectorLeft, true);
         #endregion
 
@@ -196,8 +241,8 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>:
-        /// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt; <see cref="NumColumns"/>:
+        /// result[j, i] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[j, i] + this[j, i]. 
         /// The resulting matrix is written to a new <see cref="CscMatrix"/> and then returned.
         /// </summary>
         /// <param name="otherMatrix">A matrix with the same <see cref="NumRows"/> and <see cref="NumColumns"/> as this 
@@ -238,8 +283,8 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>:
-        /// this[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt; <see cref="NumColumns"/>:
+        /// this[j, i] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[j, i] + this[j, i]. 
         /// The resulting matrix overwrites the entries of this <see cref="CscMatrix"/> instance.
         /// </summary>
         /// <param name="otherMatrix">A matrix with the same indexing arrays as this <see cref="CscMatrix"/> instance.</param>
@@ -557,9 +602,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>:
-        /// this[i, j] = <paramref name="thisCoefficient"/> * this[i, j] 
-        ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j]. 
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt; <see cref="NumColumns"/>:
+        /// this[j, i] = <paramref name="thisCoefficient"/> * this[j, i] 
+        ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[j, i]. 
         /// The resulting matrix overwrites the entries of this <see cref="CscMatrix"/> instance.
         /// </summary>
         /// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="Matrix"/>.</param>
@@ -844,8 +889,8 @@ namespace MGroup.LinearAlgebra.Matrices
         IMatrix IMatrixView.Scale(double scalar) => Scale(scalar);
 
         /// <summary>
-        /// Performs the following operation for the non-zero entries (i, j), such that 0 &lt;= i &lt; <see cref="NumRows"/>, 
-        /// 0 &lt;= j &lt; <see cref="NumColumns"/>: result[i, j] = <paramref name="scalar"/> * this[i, j].
+        /// Performs the following operation for the non-zero entries (j, i), such that 0 &lt;= j &lt; <see cref="NumRows"/>, 
+        /// 0 &lt;= i &lt; <see cref="NumColumns"/>: result[j, i] = <paramref name="scalar"/> * this[j, i].
         /// The resulting matrix is written to a new <see cref="CscMatrix"/> and then returned.
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
@@ -880,7 +925,7 @@ namespace MGroup.LinearAlgebra.Matrices
         public IMatrix Transpose() => TransposeToCSR(true);
 
         /// <summary>
-        /// Creates a new <see cref="CscMatrix"/> instance, that is transpose to this: result[i, j] = this[j, i].
+        /// Creates a new <see cref="CscMatrix"/> instance, that is transpose to this: result[j, i] = this[i, j].
         /// </summary>
         public CscMatrix TransposeToCSC()
         {
@@ -898,7 +943,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Creates a new <see cref="CsrMatrix"/> instance, that is transpose to this: result[i, j] = this[j, i]. The 
+        /// Creates a new <see cref="CsrMatrix"/> instance, that is transpose to this: result[j, i] = this[i, j]. The 
         /// internal arrays can be copied or shared with this <see cref="CscMatrix"/> instance.
         /// </summary>
         /// <param name="copyInternalArray">If true, the internal arrays that store the entries of this 

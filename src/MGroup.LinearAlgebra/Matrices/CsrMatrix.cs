@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Creates a CSR matrix with the non-zero entries of <paramref name="denseMatrix"/>. An entry must be exactly == 0, to be considered zero.
 		/// </summary>
 		/// <param name="denseMatrix"></param>
-		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix)
+		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix) //TODO: replace this with converter class, faster algorithm and option to use tolerance when identifying zero entries
 		{
 			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
 			int m = denseMatrix.NumRows;

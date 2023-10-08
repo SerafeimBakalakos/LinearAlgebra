@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Vectors;
@@ -62,11 +62,11 @@ namespace MGroup.LinearAlgebra.Matrices
         public static void Clear(this double[] thisVector) => Array.Clear(thisVector, 0, thisVector.Length);
 
         /// <summary>
-        /// Copies the entries of this instance to a new double[] array and returns it.
+        /// Copies the entries of this instance to a new <typeparamref name="T"/>[] array and returns it.
         /// </summary>
-        public static double[] Copy(this double[] thisVector)
+        public static T[] Copy<T>(this T[] thisVector)
         {
-            var clone = new double[thisVector.Length];
+            var clone = new T[thisVector.Length];
             Array.Copy(thisVector, clone, thisVector.Length);
             return clone;
         }

@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -26,7 +26,18 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             comparer.AssertEqual(zero, csc);
         }
 
-        [Fact]
+		[Fact]
+		private static void TestCreateFromDense()
+		{
+			var dense = Matrix.CreateFromArray(SparseRectangular10by5.Matrix);
+			var computed = CscMatrix.CreateFromDense(dense);
+			var expected = CscMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
+				SparseRectangular10by5.CscValues, SparseRectangular10by5.CscRowIndices, SparseRectangular10by5.CscColOffsets,
+				true);
+			comparer.AssertEqual(expected, computed);
+		}
+
+		[Fact]
         private static void TestEquality()
         {
             var full = Matrix.CreateFromArray(SparseRectangular10by5.Matrix);
