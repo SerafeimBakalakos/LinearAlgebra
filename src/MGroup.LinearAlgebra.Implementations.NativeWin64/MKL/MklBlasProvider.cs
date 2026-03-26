@@ -1,3 +1,5 @@
+using System;
+
 using IntelMKL.LP64;
 
 using MGroup.LinearAlgebra.Implementations;
@@ -30,11 +32,57 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 			int incY)
 			=> Blas.Daxpby(ref n, ref alpha, ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
+		public void Daxpby(double alpha, double[] x, double beta, double[] y)
+		{
+			int n = x.Length;
+			int incX = 1;
+			int incY = 1;
+			Blas.Daxpby(ref n, ref alpha, ref x[0], ref incX, ref beta, ref y[0], ref incY);
+		}
+
+		public void DaxpbyTo(int n, double alpha, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY, double[] z, int offsetZ, int incZ)
+		{
+			Dcopy(n, y, offsetY, incY, z, offsetZ, incZ);
+			Daxpby(n, alpha, x, offsetX, incX, beta, z, offsetZ, incZ);
+		}
+
+		public void DaxpbyTo(double alpha, double[] x, double beta, double[] y, double[] z)
+		{
+			Array.Copy(y, z, y.Length);
+			Daxpby(alpha, x, beta, z);
+		}
+
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-axpy#E25D8E10-0440-4827-BC58-BC71128EA6EE
 		/// </summary>
 		public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
 			=> Blas.Daxpy(ref n, ref alpha, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
+
+		public void Daxpy(double alpha, double[] x, double[] y)
+		{
+			int n = x.Length;
+			int incX = 1;
+			int incY = 1;
+			Blas.Daxpy(ref n, ref alpha, ref x[0], ref incX, ref y[0], ref incY);
+		}
+
+		public void DaxpyTo(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY, double[] z, int offsetZ, int incZ)
+		{
+			Dcopy(n, y, offsetY, incY, z, offsetZ, incZ);
+			Daxpy(n, alpha, x, offsetX, incX, z, offsetZ, incZ);
+		}
+
+		public void DaxpyTo(double alpha, double[] x, double[] y, double[] z)
+		{
+			Array.Copy(y, z, y.Length);
+			Daxpy(alpha, x, z);
+		}
+
+		public void Dclear(int n, double[] x, int offsetX, int incX)
+			=> defaultProvider.Dclear(n, x, offsetX, incX);
+
+		public void Dcopy(int n, double[] x, int offsetX, int incX, double[] z, int offsetZ, int incZ)
+			=> defaultProvider.Dcopy(n, x, offsetX, incX, z, offsetZ, incZ);
 
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-dot#D4E53C70-D8FA-4095-A800-4203CAFE64FE
@@ -42,21 +90,55 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 		public double Ddot(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
 			=> Blas.Ddot(ref n, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
 
+		public double Ddot(double[] x, double[] y)
+		{
+			int n = x.Length;
+			int incX = 1;
+			int incY = 1;
+			return Blas.Ddot(ref n, ref x[0], ref incX, ref y[0], ref incY);
+		}
+
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-nrm2#EA1DF8E7-FC12-4A82-A804-B62956334C40
 		/// </summary>
 		public double Dnrm2(int n, double[] x, int offsetX, int incX)
 			=> Blas.Dnrm2(ref n, ref x[offsetX], ref incX);
 
+		public double Dnrm2(double[] x)
+		{
+			int n = x.Length;
+			int incX = 1;
+			return Blas.Dnrm2(ref n, ref x[0], ref incX);
+		}
+
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-scal#7269DCFE-7235-4690-A69E-D08712D8FC44
 		/// </summary>
 		public void Dscal(int n, double alpha, double[] x, int offsetX, int incX)
 			=> Blas.Dscal(ref n, ref alpha, ref x[offsetX], ref incX);
+
+		public void Dscal(double alpha, double[] x)
+		{
+			int n = x.Length;
+			int incX = 1;
+			Blas.Dscal(ref n, ref alpha, ref x[0], ref incX);
+		}
+
+		public void DscalTo(int n, double alpha, double[] x, int offsetX, int incX, double[] z, int offsetZ, int incZ)
+		{
+			Dcopy(n, x, offsetX, incX, z, offsetZ, incZ);
+			Dscal(n, alpha, z, offsetZ, incZ);
+		}
+
+		public void DscalTo(double alpha, double[] x, double[] z)
+		{
+			Array.Copy(x, z, x.Length);
+			Dscal(alpha, z);
+		}
+
 		#endregion
 
 		#region BLAS Level 2
-
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-gemv#443228C4-626E-48A7-B230-26FB061EACF2
 		/// </summary>
@@ -66,8 +148,43 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 			=> Blas.Dgemv(transA.Translate(), ref m, ref n, ref alpha, ref a[offsetA], ref ldA,
 				ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
-		public void DgemvRowMajor(TransposeMatrix transA, int m, int n, double[] a, double[] x, double[] y)
-			=> defaultProvider.DgemvRowMajor(transA, m, n, a, x, y);
+		public void DgemvNoTranspose(int m, int n,
+			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
+			double beta, double[] y, int offsetY, int incY)
+			=> Blas.Dgemv(TransposeMatrix.NoTranspose.Translate(),
+				ref m, ref n, ref alpha, ref a[offsetA], ref ldA,ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
+
+		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y)
+		{
+			DgemvNoTranspose(m, n, 1.0, a, 0, m, x, 0, 1, 1.0, y, 0, 1);
+		}
+
+		public void DgemvTranspose(int m, int n,
+			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
+			double beta, double[] y, int offsetY, int incY)
+			=> Blas.Dgemv(TransposeMatrix.Transpose.Translate(),
+				ref m, ref n, ref alpha, ref a[offsetA], ref ldA,ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
+
+		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y)
+		{
+			DgemvTranspose(m, n, 1.0, a, 0, m, x, 0, 1, 1.0, y, 0, 1);
+		}
+
+		public void DgemvRowMajorNoTranspose(int m, int n,
+			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
+			double beta, double[] y, int offsetY, int incY)
+			=> defaultProvider.DgemvRowMajorNoTranspose(m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, y, offsetY, incY);
+
+		public void DgemvRowMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y)
+			=> defaultProvider.DgemvRowMajorNoTranspose(m, n, a, x, y);
+
+		public void DgemvRowMajorTranspose(int m, int n,
+			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
+			double beta, double[] y, int offsetY, int incY)
+			=> defaultProvider.DgemvRowMajorTranspose(m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, y, offsetY, incY);
+
+		public void DgemvRowMajorTranspose(int m, int n, double[] a, double[] x, double[] y)
+			=> defaultProvider.DgemvRowMajorNoTranspose(m, n, a, x, y);
 
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-spmv#16CB58C4-105B-486C-B6AA-42BB0C721A76

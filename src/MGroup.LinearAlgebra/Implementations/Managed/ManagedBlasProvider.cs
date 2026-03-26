@@ -25,35 +25,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private ManagedBlasProvider() { } // private constructor for singleton pattern
 
 		#region BLAS Level 2
-		public void DgemvRowMajor(TransposeMatrix transA, int m, int n, double[] a, double[] x, double[] y)
-		{
-			if (transA == TransposeMatrix.NoTranspose)
-			{
-				for (var i = 0; i < m; ++i)
-				{
-					var rowStart = i * n;
-					double sum = 0;
-					for (var j = 0; j < n; ++j)
-					{
-						sum += a[rowStart + j] * x[j];
-					}
-					y[i] = sum;
-				}
-			}
-			else
-			{
-				for (var j = 0; j < n; ++j)
-				{
-					double sum = 0;
-					for (var i = 0; i < m; ++i)
-					{
-						sum += a[i * n + j] * x[i];
-					}
-					y[j] = sum;
-				}
-			}
-		}
-
 		public void Dspmv(StoredTriangle uplo, int n,
 			double alpha, double[] a, int offsetA, double[] x, int offsetX, int incX,
 			double beta, double[] y, int offsetY, int incY)

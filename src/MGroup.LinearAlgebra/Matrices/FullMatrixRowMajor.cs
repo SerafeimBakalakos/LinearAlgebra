@@ -115,7 +115,15 @@ namespace MGroup.LinearAlgebra.Matrices
 			(TransposeMatrix transposeA, int lhsLength, int rhsLength) = TransposeUtilities.PrepareBlas(this, transposeThis);
 			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
-			GlobalProvider.Blas.DgemvRowMajor(transposeA, NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
+
+			if (transposeThis)
+			{
+				GlobalProvider.Blas.DgemvRowMajorTranspose(NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
+			}
+			else
+			{
+				GlobalProvider.Blas.DgemvRowMajorNoTranspose(NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
+			}
 		}
 
 		public void SetRow(int rowIdx, Vector rowValues)

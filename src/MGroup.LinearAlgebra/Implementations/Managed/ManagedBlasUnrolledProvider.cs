@@ -81,6 +81,27 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 
 		public void Dgemm(TransposeMatrix transA, TransposeMatrix transB, int m, int n, int k, double alpha, double[] a, int offsetA, int ldA, double[] b, int offsetB, int ldB, double beta, double[] c, int offsetC, int ldC)
 			=> throw new NotImplementedException();
+		public void Daxpby(double alpha, double[] x, double beta, double[] y) => throw new NotImplementedException();
+		public void DaxpbyTo(int n, double alpha, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY, double[] z, int offsetZ, int incZ) => throw new NotImplementedException();
+		public void DaxpbyTo(double alpha, double[] x, double beta, double[] y, double[] z) => throw new NotImplementedException();
+		public void Daxpy(double alpha, double[] x, double[] y) => throw new NotImplementedException();
+		public void DaxpyTo(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY, double[] z, int offsetZ, int incZ) => throw new NotImplementedException();
+		public void DaxpyTo(double alpha, double[] x, double[] y, double[] z) => throw new NotImplementedException();
+		public void Dclear(int n, double[] x, int offsetX, int incX) => throw new NotImplementedException();
+		public void Dcopy(int n, double[] x, int offsetX, int incX, double[] z, int offsetZ, int incZ) => throw new NotImplementedException();
+		public double Ddot(double[] x, double[] y) => throw new NotImplementedException();
+		public double Dnrm2(double[] x) => throw new NotImplementedException();
+		public void Dscal(double alpha, double[] x) => throw new NotImplementedException();
+		public void DscalTo(int n, double alpha, double[] x, int offsetX, int incX, double[] z, int offsetZ, int incZ) => throw new NotImplementedException();
+		public void DscalTo(double alpha, double[] x, double[] z) => throw new NotImplementedException();
+		public void DgemvNoTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
+		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
+		public void DgemvTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
+		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
+		public void DgemvRowMajorNoTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
+		public void DgemvRowMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
+		public void DgemvRowMajorTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
+		public void DgemvRowMajorTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
 		#endregion
 	}
 }

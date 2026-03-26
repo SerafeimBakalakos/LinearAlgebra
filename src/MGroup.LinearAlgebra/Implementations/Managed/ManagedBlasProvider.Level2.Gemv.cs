@@ -60,6 +60,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					double xj = x[offsetX + j];
 					if (xj == 0.0)
 					{
+						colA += ldA;
 						continue;
 					}
 
@@ -103,6 +104,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					indexX += incX;
 					if (xj == 0.0)
 					{
+						colA += ldA;
 						continue;
 					}
 
@@ -119,9 +121,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		/// <summary>
-		/// Special case of <see cref="DgemvNoTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0. It only performs matrix-vector multiplication.
-		/// </summary>
 		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmDimensions(m, n, a, x, y);
@@ -133,6 +132,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 				double xj = x[j];
 				if (xj == 0.0)
 				{
+					colA += m;
 					continue;
 				}
 
@@ -226,9 +226,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		/// <summary>
-		/// Special case of <see cref="DgemvTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0. It only performs transposed-matrix - vector multiplication.
-		/// </summary>
 		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmTransposeDimensions(m, n, a, x, y);
@@ -327,9 +324,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		/// <summary>
-		/// Special case of <see cref="DgemvRowMajorNoTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0. It only performs matrix - vector multiplication.
-		/// </summary>
 		public void DgemvRowMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmDimensions(m, n, a, x, y);
@@ -388,6 +382,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					double xj = x[offsetX + j];
 					if (xj == 0.0)
 					{
+						rowA += ldA;
 						continue;
 					}
 
@@ -431,6 +426,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					indexX += incX;
 					if (xj == 0.0)
 					{
+						rowA += ldA;
 						continue;
 					}
 
@@ -448,9 +444,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		/// <summary>
-		/// Special case of <see cref="DgemvRowMajorTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0. It only performs transposed matrix-vector multiplication.
-		/// </summary>
 		public void DgemvRowMajorTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmTransposeDimensions(m, n, a, x, y);
@@ -462,6 +455,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 				double xj = x[j];
 				if (xj == 0.0)
 				{
+					rowA += n;
 					continue;
 				}
 
