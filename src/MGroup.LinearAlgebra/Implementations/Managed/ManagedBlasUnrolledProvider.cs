@@ -95,9 +95,9 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public void DscalTo(int n, double alpha, double[] x, int offsetX, int incX, double[] z, int offsetZ, int incZ) => throw new NotImplementedException();
 		public void DscalTo(double alpha, double[] x, double[] z) => throw new NotImplementedException();
 		public void DgemvNoTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
-		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
-		public void DgemvTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
-		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
+		public void DgemvColMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
+		public void DgemvColMajorTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
+		public void DgemvColMajorTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
 		public void DgemvRowMajorNoTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();
 		public void DgemvRowMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y) => throw new NotImplementedException();
 		public void DgemvRowMajorTranspose(int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY) => throw new NotImplementedException();

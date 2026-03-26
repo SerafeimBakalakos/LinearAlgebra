@@ -38,26 +38,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 				CblasLevel2Implementations.Diagonal.Zero, n, alpha, a, offsetA, x, offsetX, incX, 1.0, y, offsetY, incY);
 		}
 
-		public void Dtpmv(StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int n,
-			double[] a, int offsetA, double[] x, int offsetX, int incX)
-		{
-			// The copy may be avoidable in trangular operations, if we start the dot products from the bottom
-			var input = new double[x.Length];
-			Array.Copy(x, input, x.Length);
-
-			CblasLevel2Implementations.Diagonal managedDiag = (diag == DiagonalValues.NonUnit) ?
-				CblasLevel2Implementations.Diagonal.Regular : CblasLevel2Implementations.Diagonal.Unit;
-			if (UseUpperImplementation(uplo, transA))
-			{
-				CblasLevel2Implementations.UpperTimesVectorPackedColMajor(
-					managedDiag, n, 1.0, a, offsetA, input, offsetX, incX, 0.0, x, offsetX, incX);
-			}
-			else
-			{
-				CblasLevel2Implementations.LowerTimesVectorPackedRowMajor(
-					managedDiag, n, 1.0, a, offsetA, input, offsetX, incX, 0.0, x, offsetX, incX);
-			}
-		}
+		
 
 		public void Dtpsv(StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int n,
 			double[] a, int offsetA, double[] x, int offsetX, int incX)
@@ -145,6 +126,23 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			if (m > 0 && n > 0)
 			{
 				int lastIndex = offset + (m - 1) * leadDim + (n - 1);
+				Debug.Assert(lastIndex < a.Length, "Not enough space in matrix array");
+			}
+		}
+
+		[Conditional("DEBUG")]
+		private static void AssertMatrixTriangular(double[] a, int n, int offset, int ldA)
+		{
+			Debug.Assert(a != null, "Matrix cannot be null");
+			Debug.Assert(n >= 0, "Required: n >= 0");
+			Debug.Assert(ldA >= Math.Max(1, n), "Required: ldA >= n");
+			Debug.Assert(offset >= 0, "Required: offset >= 0");
+			Debug.Assert(offset < a.Length, "Required: offset < a.Length");
+
+			if (n > 0)
+			{
+				// Last used element is bottom of last column
+				int lastIndex = offset + (n - 1) * ldA + (n - 1);
 				Debug.Assert(lastIndex < a.Length, "Not enough space in matrix array");
 			}
 		}

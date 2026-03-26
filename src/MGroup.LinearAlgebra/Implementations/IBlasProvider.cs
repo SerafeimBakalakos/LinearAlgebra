@@ -81,16 +81,16 @@ namespace MGroup.LinearAlgebra.Implementations
 		/// <summary>
 		/// Special case of <see cref="DgemvNoTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0 and tightly packed matrix and vectors. It only performs matrix-vector multiplication.
 		/// </summary>
-		void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y);
+		void DgemvColMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y);
 
-		void DgemvTranspose(int m, int n,
+		void DgemvColMajorTranspose(int m, int n,
 			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
 			double beta, double[] y, int offsetY, int incY);
 
 		/// <summary>
-		/// Special case of <see cref="DgemvTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0 and tightly packed matrix and vectors. It only performs transposed-matrix - vector multiplication.
+		/// Special case of <see cref="DgemvColMajorTranspose(int, int, double, double[], int, int, double[], int, int, double, double[], int, int)"/> for alpha = 1, beta = 0 and tightly packed matrix and vectors. It only performs transposed-matrix - vector multiplication.
 		/// </summary>
-		void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y);
+		void DgemvColMajorTranspose(int m, int n, double[] a, double[] x, double[] y);
 
 		void DgemvRowMajorNoTranspose(int m, int n,
 			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
@@ -132,6 +132,18 @@ namespace MGroup.LinearAlgebra.Implementations
 		/// </summary>
 		void Dtpsv(StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int n,
 			double[] a, int offsetA, double[] x, int offsetX, int incX);
+
+		void Dtrmv(StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
+
+		void DtrmvRowMajor(StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
+
+		void DtrmvColMajorLowerNoTranspose(DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
+
+		void DtrmvColMajorLowerTranspose(DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
+
+		void DtrmvColMajorUpperNoTranspose(DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
+
+		void DtrmvColMajorUpperTranspose(DiagonalValues diag, int n, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX);
 
 		/// <summary>
 		/// x = inv(op(A)) * x, where op(A) = A or transpose(A). A is a triangular matrix, stored in full format, but only the 

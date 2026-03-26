@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 			else
 			{
-				DgemvTranspose(m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, y, offsetY, incY);
+				DgemvColMajorTranspose(m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, y, offsetY, incY);
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y)
+		public void DgemvColMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmDimensions(m, n, a, x, y);
 			Array.Clear(y, 0, m);
@@ -145,7 +145,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		public void DgemvTranspose(int m, int n,
+		public void DgemvColMajorTranspose(int m, int n,
 			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
 			double beta, double[] y, int offsetY, int incY)
 		{
@@ -226,7 +226,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			}
 		}
 
-		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y)
+		public void DgemvColMajorTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			AssertMvmTransposeDimensions(m, n, a, x, y);
 

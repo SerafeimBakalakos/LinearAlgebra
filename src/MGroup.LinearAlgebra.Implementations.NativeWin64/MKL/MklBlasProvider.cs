@@ -154,20 +154,20 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 			=> Blas.Dgemv(TransposeMatrix.NoTranspose.Translate(),
 				ref m, ref n, ref alpha, ref a[offsetA], ref ldA,ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
-		public void DgemvNoTranspose(int m, int n, double[] a, double[] x, double[] y)
+		public void DgemvColMajorNoTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
 			DgemvNoTranspose(m, n, 1.0, a, 0, m, x, 0, 1, 1.0, y, 0, 1);
 		}
 
-		public void DgemvTranspose(int m, int n,
+		public void DgemvColMajorTranspose(int m, int n,
 			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
 			double beta, double[] y, int offsetY, int incY)
 			=> Blas.Dgemv(TransposeMatrix.Transpose.Translate(),
 				ref m, ref n, ref alpha, ref a[offsetA], ref ldA,ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
-		public void DgemvTranspose(int m, int n, double[] a, double[] x, double[] y)
+		public void DgemvColMajorTranspose(int m, int n, double[] a, double[] x, double[] y)
 		{
-			DgemvTranspose(m, n, 1.0, a, 0, m, x, 0, 1, 1.0, y, 0, 1);
+			DgemvColMajorTranspose(m, n, 1.0, a, 0, m, x, 0, 1, 1.0, y, 0, 1);
 		}
 
 		public void DgemvRowMajorNoTranspose(int m, int n,
