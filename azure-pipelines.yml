@@ -48,6 +48,7 @@ steps:
 - task: SonarCloudPrepare@3
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Prepares SonarCloud analysis"
+  continueOnError: true
   inputs:
     SonarCloud: 'SonarCloud'
     organization: 'mgroupntua'
